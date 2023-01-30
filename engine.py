@@ -228,25 +228,16 @@ class forecast_trainer:
         else:
             long_his=args.long_his
         self.dglv2 = DiscreteGraphLearningV2(args.device, self.source_name, self.target_name, 10, long_his, args.short_his, args.data_number, args.model).to(self.device)
-        # discrete graph learning v1, gts
-        ## self.dgl_s = DiscreteGraphLearning(dataset_name = self.source_name, k=10).to(self.device)
-        ## self.dgl_t = DiscreteGraphLearning(dataset_name = self.target_name, k=10, data_number=args.data_number).to(self.device)
         if args.adaptadj:
             self.adp_s = AdaptiveAdjacency(num_nodes_s, 10).to(self.device)
             self.adp_t = AdaptiveAdjacency(num_nodes_t, 10).to(self.device)
             # dglv2
             self.optimizer_s = optim.Adam(list(self.gwnet_model.parameters())+list(self.adp_s.parameters())+list(self.dglv2.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
             self.optimizer_t = optim.Adam(list(self.gwnet_model.parameters())+list(self.adp_t.parameters())+list(self.dglv2.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
-            # dglv1
-            ## self.optimizer_s = optim.Adam(list(self.gwnet_model.parameters())+list(self.adp_s.parameters())+list(self.dgl_s.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
-            ## self.optimizer_t = optim.Adam(list(self.gwnet_model.parameters())+list(self.adp_t.parameters())+list(self.dgl_t.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
         else:
             # dglv2
             self.optimizer_s = optim.Adam(list(self.gwnet_model.parameters())+list(self.dglv2.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
             self.optimizer_t = optim.Adam(list(self.gwnet_model.parameters())+list(self.dglv2.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
-            # dglv1
-            ## self.optimizer_s = optim.Adam(list(self.gwnet_model.parameters())+list(self.dgl_s.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
-            ## self.optimizer_t = optim.Adam(list(self.gwnet_model.parameters())+list(self.dgl_t.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
         self.tsf_type = args.model
         if self.tsf_type == 'TSFormer':
             self.tsformer = TSFormer(args.patch_size, args.in_channel, args.embed_dim, args.num_heads, args.mlp_ratio, args.dropout, 
@@ -274,38 +265,24 @@ class forecast_trainer:
     def source_train(self, xs, ys, long_xs, xt=None, yt=None):
         # dglv2
         self.dglv2.train()
-        # dglv1
-        ## self.dgl_s.train()
         self.gwnet_model.train()
         self.optimizer_s.zero_grad()
         xs = xs.to(self.device)
         ys = ys.to(self.device)
         long_xs = long_xs.to(self.device)
-        # use long term feature
-        ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_s(long_xs, tsformer=self.tsformer)
-        # do not use long term feature
-        ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_s(long_xs, tsformer=None)
 
         # dglv2
         bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dglv2(long_xs, tsformer=self.tsformer, compute_hidden=False, domain='s')
         if self.args.adaptadj:
             adp = self.adp_s()
-            # use long term feature
-            ## out = self.gwnet_model(xs[:,:,:,:2], adp=adp, sampled_adj=sampled_adj,hidden_states=hidden_states[:,:,-1,:]) ## (batch_size, num_node, 12)
-            # do not use long term feature
             out, tonly_s, st_s = self.gwnet_model(xs[:,:,:,:2], adp=adp, sampled_adj=sampled_adj,return_st=True)
         else:
-            # use long term feature
-            ## out = self.gwnet_model(xs[:,:,:,:2], adp=None, sampled_adj=sampled_adj,hidden_states=hidden_states[:,:,-1,:])
-            # do not use long term feature
             out, tonly_s, st_s = self.gwnet_model(xs[:,:,:,:2], adp=None, sampled_adj=sampled_adj, return_st=True)
         
-        ###### Remove forward pass on target
         
         if xt is not None and yt is not None:
             xt = xt.to(self.device)
             yt = yt.to(self.device)
-            # we don't need long term feature here. 
             _, _, _, sampled_adj_t = self.dglv2(xt, tsformer = self.tsformer, compute_hidden=False, domain='t')
             if self.args.adaptadj:
                 adp_t = self.adp_t()
@@ -340,8 +317,7 @@ class forecast_trainer:
             sampled_st_t_ = (st_t_ - t_t_)[:,:,t_idx, -1].transpose(1, 2).reshape(-1, num_feat)
             coral_loss += self.coral_loss_unit(sampled_st_s_, sampled_st_t_)
         """
-        # apply coral on st - reconstructed st features
-        ###### remove coral loss
+        # apply coral on st - reconstructed st feature
         
         for st_s_, st_t_, t_s_, t_t_, recons in zip(st_s, st_t, tonly_s, tonly_t, self.reconstructors):
             num_feat = st_s_.shape[1]
@@ -362,18 +338,13 @@ class forecast_trainer:
         loss = mae_loss + degree_loss * self.degree_reg + coral_loss * self.coral_reg
         loss.backward()
         if self.clip is not None:
-            # dglv1
-            ## nn.utils.clip_grad_norm_(list(self.gwnet_model.parameters())+list(self.dgl_s.parameters()), self.clip)
-            # dglv2
             nn.utils.clip_grad_norm_(list(self.gwnet_model.parameters())+list(self.dglv2.parameters()), self.clip)
         self.optimizer_s.step()
         rmse = util.masked_rmse(out, ys, 0.0)
         mape = util.masked_mape(out, ys, 0.0)
         # print(out.shape)
 
-        # train reconstructors
-        #### remove training reconstructors
-        
+        # train reconstructor
         recons_losses = []
         for st_s_, st_t_, t_s_, t_t_, recons in zip(st_s, st_t, tonly_s, tonly_t, self.reconstructors):
             st_s_ = st_s_.detach()
@@ -394,32 +365,19 @@ class forecast_trainer:
     def source_eval(self, xs, ys, long_xs, return_val = False):
         # dglv2
         self.dglv2.eval()
-        # dglv1
-        ## self.dgl_s.eval()
         self.gwnet_model.eval()
         
         with torch.no_grad():
             xs = xs.to(self.device)
             ys = ys.to(self.device)
             long_xs = long_xs.to(self.device)
-            # dglv1
-            # use long term feature
-            ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_s(long_xs,tsformer=self.tsformer)
-            # do not use long term feature
-            ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_s(long_xs,tsformer=None)
 
             # dglv2
             bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dglv2(long_xs, tsformer=self.tsformer, compute_hidden=False, domain='s')
             if self.args.adaptadj:
                 adp = self.adp_s()
-                # use long term feature
-                ## out = self.gwnet_model(xs[:,:,:,:2], adp=adp, sampled_adj=sampled_adj,hidden_states=hidden_states[:,:,-1,:]) ## (batch_size, num_node, 12)
-                # do not use long term feature
                 out = self.gwnet_model(xs[:,:,:,:2], adp=adp, sampled_adj=sampled_adj)
             else:
-                # use long term feature
-                ## out = self.gwnet_model(xs[:,:,:,:2], adp=None, sampled_adj=sampled_adj, hidden_states=hidden_states[:,:,-1,:])
-                # do not use long term feature
                 out = self.gwnet_model(xs[:,:,:,:2], adp=None, sampled_adj=sampled_adj)
             ys = ys[:,:,:,0].transpose(-2,-1)
             out = self.scaler_s.inverse_transform(out)
@@ -433,8 +391,6 @@ class forecast_trainer:
             return loss.item(), rmse.item(), mape.item()
 
     def fine_tune(self, xt, yt, long_xt, use_long=False):
-        # dglv1
-        ## self.dgl_t.train()
         # dglv2
         self.dglv2.train()
         self.gwnet_model.train()
@@ -443,38 +399,15 @@ class forecast_trainer:
         yt = yt.to(self.device)
         long_xt = long_xt.to(self.device)
         # print('long_xt', long_xt.shape)
-        
-        ##### The following lines of code aims to remove those without sufficient long-term features from optimization
-        # batch_size = long_xt.shape[0]
-        # long_xt_min = long_xt[:,:,:,0].view(batch_size, -1).min(1)[0]
-        # long_xt_max = long_xt[:,:,:,0].view(batch_size, -1).max(1)[0]
-        # mask = torch.logical_or(long_xt_min!=0, long_xt_max!=0)
-        # long_xt = long_xt[mask, :,:,:]
-        # xt = xt[mask,:,:,:]
-        # yt = yt[mask,:,:,:]
-        # print("Effective batch size %d" % yt.shape[0])
-        # long_xt = long_xt.to(self.device)
-        
-        # print(self.gwnet_model.start_conv.bias)
-        # dglv1
-        # use long term feature
-        ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_t(long_xt,tsformer = self.tsformer)
-        # do not use long term feature
-        ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_t(long_xt,tsformer = None)
+
         
         # dglv2
         bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dglv2(long_xt, tsformer=self.tsformer, compute_hidden=True, domain='t')
         if self.args.adaptadj:
             adp = self.adp_t()
-            # use long term feature
             out = self.gwnet_model(xt[:,:,:,:2], adp=adp, sampled_adj=sampled_adj, hidden_states=hidden_states[:,:,-1,:]) ## (batch_size, num_node, 12)
-            # do not use long term feature
-            ## out = self.gwnet_model(xt[:,:,:,:2], adp=adp, sampled_adj=sampled_adj)
         else:
-            # use long term feature
             out = self.gwnet_model(xt[:,:,:,:2], adp=None, sampled_adj=sampled_adj, hidden_states=hidden_states[:,:,-1,:])
-            # do not use long term feature
-            ## out = self.gwnet_model(xt[:,:,:,:2], adp=None, sampled_adj=sampled_adj)
         yt = yt[:,:,:,0].transpose(-2,-1)
         out = self.scaler_t.inverse_transform(out)
         yt = self.scaler_t.inverse_transform(yt)
@@ -483,9 +416,6 @@ class forecast_trainer:
         loss = mae_loss + degree_loss * self.degree_reg
         loss.backward()
         if self.clip is not None:
-            # dglv1
-            ## nn.utils.clip_grad_norm_(list(self.gwnet_model.parameters())+list(self.dgl_t.parameters()), self.clip)
-            # dglv2
             nn.utils.clip_grad_norm_(list(self.gwnet_model.parameters())+list(self.dglv2.parameters()), self.clip)
         self.optimizer_t.step()
         rmse = util.masked_rmse(out, yt, 0.0)
@@ -494,35 +424,22 @@ class forecast_trainer:
         return mae_loss.item(), rmse.item(), mape.item(), degree_loss.item()
 
     def target_eval(self, xt, yt, long_xt=None, return_val=False, use_long=False):
-        
-        # dglv1
-        ## self.dgl_t.eval()
-        # dglv2
+
         self.dglv2.eval()
         self.gwnet_model.eval()
         with torch.no_grad():
             xt = xt.to(self.device)
             yt = yt.to(self.device)
             long_xt = long_xt.to(self.device)
-            # dglv1
-            # use long term feature
-            ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_t(long_xt,tsformer = self.tsformer)
-            # do not use long term feature
-            ## bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dgl_t(long_xt,tsformer = None)
-            # dglv2
+
             
             bernoulli_unnorm, hidden_states, adj_knn, sampled_adj = self.dglv2(long_xt, tsformer=self.tsformer, compute_hidden=True, domain='t')
             if self.args.adaptadj:
                 adp = self.adp_t()
-                # use long term feature
                 out = self.gwnet_model(xt[:,:,:,:2], adp=adp, sampled_adj=sampled_adj,hidden_states=hidden_states[:,:,-1,:]) ## (batch_size, num_node, 12)
-                # do not use long term feature
-                ## out = self.gwnet_model(xt[:,:,:,:2], adp=adp, sampled_adj=sampled_adj) ## (batch_size, num_node, 12)
+
             else:
-                # use long term feature
                 out = self.gwnet_model(xt[:,:,:,:2], adp=None, sampled_adj=sampled_adj,hidden_states=hidden_states[:,:,-1,:])
-                # do not use long term feature
-                ## out = self.gwnet_model(xt[:,:,:,:2], adp=None, sampled_adj=sampled_adj)
             yt = yt[:,:,:,0].transpose(-2,-1)
             out = self.scaler_t.inverse_transform(out)
             yt = self.scaler_t.inverse_transform(yt)
