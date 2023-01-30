@@ -2,6 +2,7 @@
 This repo contains tpen-source code of TransGTR.
 
 ## Dependencies
+- Python 3.8.5
 - Pytorch 1.9.0
 
 ## Datasets
