@@ -10,6 +10,9 @@ For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS
 
 ## Steps to run TransGTR. 
 
+### Step 0, Pre-process data. 
+
+
 ### Step 1, Train a source feature network. 
 If you want to use METR-LA or PEMS-BAY as source cities, you can obtain a pre-trained source feature network (TSFormer) from [STEP](https://github.com/zezhishao/STEP/tree/github/tsformer_ckpt). Otherwise, you should run the script 
 
