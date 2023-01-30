@@ -8,6 +8,14 @@ This repo contains tpen-source code of TransGTR.
 ## Datasets
 For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). You can put the downloaded data in `TransGTR/METR-LA`, `TransGTR/PEMS-BAY` and `TransGTR/PEMSD7M`, respectively. 
 
+## Contents of this repo
+- `model.py` implements the base models, like the node feature network (`DistilTSFormer`), the graph generator (`DiscreteGraphLearningV2`), and the forecasting model. 
+- `engine.py` implements the trainers of TransGTR. 
+- `util.py` implements necessary utility functions, such as metrics and datasets. 
+- `train_tsformer.py` implements the code for training source feature networks (in case pre-trained TSFormers are not available). 
+- `train_distil.py` implements the code for training node feature networks $\theta_{nf}$ via knowledge distillation. 
+- `train_forecast.py` implements the code for joint training of forecasting model $\theta$ and graph generator $\phi$. It includes both source training and fine-tuning. 
+
 ## Steps to run TransGTR. 
 
 ### Step 0, Pre-process data. 
