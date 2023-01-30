@@ -6,12 +6,12 @@ This repo contains tpen-source code of TransGTR.
 - Pytorch 1.9.0
 
 ## Datasets
-For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). 
+For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). You can put the downloaded data in `TransGTR/METR-LA`, `TransGTR/PEMS-BAY` and `TransGTR/PEMSD7M`, respectively. 
 
 ## Steps to run TransGTR. 
 
 ### Step 0, Pre-process data. 
-
+We provide data pre-processing scripts in `data_scripts/`. For example, if you want to 
 
 ### Step 1, Train a source feature network. 
 If you want to use METR-LA or PEMS-BAY as source cities, you can obtain a pre-trained source feature network (TSFormer) from [STEP](https://github.com/zezhishao/STEP/tree/github/tsformer_ckpt). Otherwise, you should run the script 
