@@ -11,7 +11,12 @@ For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS
 ## Steps to run TransGTR. 
 
 ### Step 0, Pre-process data. 
-We provide data pre-processing scripts in `data_scripts/`. For example, if you want to 
+We provide data pre-processing scripts in `data_scripts/`. For example, if you want to train the model with METR-LA as source and PEMSD7M as target, you should run the following data preprocessing scripts. 
+`python3 data_scripts/generate_training_data_METR_LA.py --output_dir METR-LA/ --data_file_path METR-LA/metr-la.h5 --history_seq_len 2016 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_data_METR_LA.py --output_dir METR-LA/ --data_file_path METR-LA/metr-la.h5 --history_seq_len 12 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_PEMSD7M.py --output_dir PEMSD7M/ --data_file_path PEMSD7M/V_228.csv --history_seq_len 2016 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_PEMSD7M.py --output_dir PEMSD7M/ --data_file_path PEMSD7M/V_228.csv --history_seq_len 12 --future_seq_len 12 --tod --dow`
+where `--history_seq_len 2016` is used to train the node feature network, and `--history_seq_len 12` is used to train the forecasting model. 
 
 ### Step 1, Train a source feature network. 
 If you want to use METR-LA or PEMS-BAY as source cities, you can obtain a pre-trained source feature network (TSFormer) from [STEP](https://github.com/zezhishao/STEP/tree/github/tsformer_ckpt). Otherwise, you should run the script 
