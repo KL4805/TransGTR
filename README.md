@@ -1,5 +1,5 @@
 # TransGTR
-This repo contains tpen-source code of TransGTR.
+This repo contains open-source code of TransGTR.
 
 ## Dependencies
 - Python 3.8.5
