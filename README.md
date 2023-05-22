@@ -6,7 +6,13 @@ This repo contains open-source code of TransGTR.
 - Pytorch 1.9.0
 
 ## Datasets
-For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). You can put the downloaded data in `data/METR-LA`, `data/PEMS-BAY` and `data/PEMSD7M`, respectively. 
+For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). 
+
+You can put the downloaded data in `data/METR-LA`, `data/PEMS-BAY` and `data/PEMSD7M`, respectively. 
+
+You will need to run the following command to unzip the PEMS-BAY file as stated by DL-Traff. 
+
+`unzip data/PEMS-BAY/pems-bay.zip'
 
 ## Contents of this repo
 - `model.py` implements the base models, like the node feature network (`DistilTSFormer`), the graph generator (`DiscreteGraphLearningV2`), and the forecasting model. 
