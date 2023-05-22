@@ -164,8 +164,8 @@ if __name__ == "__main__":
     DATASET_NAME = "METR-LA"
     TOD = True                  # if add time_of_day feature
     DOW = True                  # if add day_of_week feature
-    OUTPUT_DIR = "datasets/" + DATASET_NAME
-    DATA_FILE_PATH = "datasets/raw_data/{0}/{0}.h5".format(DATASET_NAME)
+    OUTPUT_DIR = "data/METR-LA/" 
+    DATA_FILE_PATH = "data/METR-LA/metr-la.h5"
     GRAPH_FILE_PATH = "datasets/raw_data/{0}/adj_{0}.pkl".format(DATASET_NAME)
 
     parser = argparse.ArgumentParser()
