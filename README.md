@@ -12,7 +12,7 @@ You can put the downloaded data in `data/METR-LA`, `data/PEMS-BAY` and `data/PEM
 
 You will need to run the following command to unzip the PEMS-BAY file as stated by DL-Traff. 
 
-`unzip data/PEMS-BAY/pems-bay.zip'
+`unzip data/PEMS-BAY/pems-bay.zip`
 
 ## Contents of this repo
 - `model.py` implements the base models, like the node feature network (`DistilTSFormer`), the graph generator (`DiscreteGraphLearningV2`), and the forecasting model. 
