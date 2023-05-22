@@ -165,8 +165,8 @@ if __name__ == "__main__":
     DATASET_NAME = "PEMSD7M"
     TOD = True                  # if add time_of_day feature
     DOW = True                  # if add day_of_week feature
-    OUTPUT_DIR = "datasets/" + DATASET_NAME
-    DATA_FILE_PATH = "datasets/raw_data/{0}/{0}.h5".format(DATASET_NAME)
+    OUTPUT_DIR = "data/PEMSD7M/"
+    DATA_FILE_PATH = "data/PEMSD7M/V_228.csv"
     GRAPH_FILE_PATH = "datasets/raw_data/{0}/adj_{0}.pkl".format(DATASET_NAME)
 
     parser = argparse.ArgumentParser()
