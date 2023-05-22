@@ -6,7 +6,7 @@ This repo contains open-source code of TransGTR.
 - Pytorch 1.9.0
 
 ## Datasets
-For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). You can put the downloaded data in `TransGTR/METR-LA`, `TransGTR/PEMS-BAY` and `TransGTR/PEMSD7M`, respectively. 
+For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS-BAY, and PEMSD7M. They can be downloaded from [DL-Traff](https://github.com/deepkashiwa20/DL-Traff-Graph). You can put the downloaded data in `data/METR-LA`, `data/PEMS-BAY` and `data/PEMSD7M`, respectively. 
 
 ## Contents of this repo
 - `model.py` implements the base models, like the node feature network (`DistilTSFormer`), the graph generator (`DiscreteGraphLearningV2`), and the forecasting model. 
@@ -21,13 +21,13 @@ For double-blind reviewing, we only provide three public datasets, METR-LA, PEMS
 ### Step 0, Pre-process data. 
 We provide data pre-processing scripts in `data_scripts/`. For example, if you want to train the model with METR-LA as source and PEMSD7M as target, you should run the following data preprocessing scripts. 
 
-`python3 data_scripts/generate_training_data_METR_LA.py --output_dir METR-LA/ --data_file_path METR-LA/metr-la.h5 --history_seq_len 2016 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_data_METR_LA.py --history_seq_len 2016 --future_seq_len 12`
 
-`python3 data_scripts/generate_training_data_METR_LA.py --output_dir METR-LA/ --data_file_path METR-LA/metr-la.h5 --history_seq_len 12 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_data_METR_LA.py --history_seq_len 12 --future_seq_len 12`
 
-`python3 data_scripts/generate_training_PEMSD7M.py --output_dir PEMSD7M/ --data_file_path PEMSD7M/V_228.csv --history_seq_len 2016 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_PEMSD7M.py --history_seq_len 2016 --future_seq_len 12`
 
-`python3 data_scripts/generate_training_PEMSD7M.py --output_dir PEMSD7M/ --data_file_path PEMSD7M/V_228.csv --history_seq_len 12 --future_seq_len 12 --tod --dow`
+`python3 data_scripts/generate_training_PEMSD7M.py --history_seq_len 12 --future_seq_len 12`
 
 where `--history_seq_len 2016` is used to train the node feature network, and `--history_seq_len 12` is used to train the forecasting model. 
 
