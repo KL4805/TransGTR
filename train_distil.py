@@ -78,11 +78,11 @@ def main(args):
     elif 'PEMS-BAY' in args.sdata:
         sdata_prefix = 'PEMS-BAY'
     if 'PEMSD7M' in args.tdata:
-        save_distilformer = 'garage_distilformer/PEMSD7M/' + sdata_prefix+'_'+args.expid + '/'
+        save_distilformer = 'garage_nf/PEMSD7M/' + sdata_prefix+'_'+args.expid + '/'
         if not os.path.exists(save_distilformer):
             os.makedirs(save_distilformer)
     elif 'HKTSM' in args.tdata:
-        save_distilformer = 'garage_distilformer/HKTSM/' + sdata_prefix+'_'+args.expid + '/'
+        save_distilformer = 'garage_nf/HKTSM/' + sdata_prefix+'_'+args.expid + '/'
         if not os.path.exists(save_distilformer):
             os.makedirs(save_distilformer)
 
