@@ -47,9 +47,9 @@ and set other parameters as you like.
 ### Step 2, Train the node feature network $\theta_{nf}$ via knowledge distillation. 
 To train the node feature network $\theta_{nf}$, you should run the script
 
-`python3 train_distil.py --student_model DistilFormer --sdata [SOURCE DATA PATH] --tdata [TARGET DATA PATH] --teacher_model_path [SOURCE FEATURE NETWORK PATH] --data_number [DATA NUMBER] --encoder_depth 3`
+`python3 train_distil.py --sdata [SOURCE DATA PATH] --tdata [TARGET DATA PATH] --teacher_model_path [SOURCE FEATURE NETWORK PATH] --data_number [DATA NUMBER] --encoder_depth 3`
 
-and set other parameters as you like. `DATA NUMBER` refers to the number of target data (in days). `DistilFormer` denotes the TSFormer enriched with day-in-week encodings. 
+and set other parameters as you like. `DATA NUMBER` refers to the number of target data (in days). 
 
 ### Step 3, Train the forecasting model $\theta$ and the graph generator $\phi$ jointly. 
 To train the forecasting model $\theta$ and the graph generator $\phi$ jointly, you should run the script 
