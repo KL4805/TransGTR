@@ -54,6 +54,6 @@ and set other parameters as you like. `DATA NUMBER` refers to the number of targ
 ### Step 3, Train the forecasting model $\theta$ and the graph generator $\phi$ jointly. 
 To train the forecasting model $\theta$ and the graph generator $\phi$ jointly, you should run the script 
 
-`python3 train_forecast.py --sdata [SOURCE DATA PATH] --tdata [TARGET DATA PATH] --model DistilFormer --tsformer_path [NODE FEATURE NETWORK PATH] --data_number [DATA_NUMBER]`
+`python3 train_forecast.py --sdata [SOURCE DATA PATH] --tdata [TARGET DATA PATH] --nfmodel DistilFormer --tsformer_path [NODE FEATURE NETWORK PATH] --data_number [DATA_NUMBER]`
 
 and set other parameters as you like. 
